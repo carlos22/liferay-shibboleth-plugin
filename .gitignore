@@ -1,3 +1,7 @@
 target
 .idea
 liferay-shibboleth-plugin.iml
+/bin/
+/.settings/
+/.classpath
+/.project

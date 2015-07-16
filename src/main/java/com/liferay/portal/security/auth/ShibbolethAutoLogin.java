@@ -202,10 +202,18 @@ public class ShibbolethAutoLogin implements AutoLogin {
         boolean sendEmail = false;
         ServiceContext serviceContext = null;
 
-        return UserLocalServiceUtil.addUser(creatorUserId, companyId, autoPassword, password1, password2,
+        User user =  UserLocalServiceUtil.addUser(creatorUserId, companyId, autoPassword, password1, password2,
                 autoScreenName, screenName, emailAddress, facebookId, openId, locale, firstName, middleName, lastName,
                 prefixId, suffixId, male, birthdayMonth, birthdayDay, birthdayYear, jobTitle, groupIds,
                 organizationIds, roleIds, userGroupIds, sendEmail, serviceContext);
+        
+        user.setPasswordReset(false);
+//        user.setAgreedToTermsOfUse(true);
+//        user.setReminderQueryAnswer("default");
+//        user.setReminderQueryAnswer("default");
+        UserLocalServiceUtil.updateUser(user);
+        
+        return user;
     }
 
     protected void updateUserFromSession(User user, HttpSession session) throws Exception {
