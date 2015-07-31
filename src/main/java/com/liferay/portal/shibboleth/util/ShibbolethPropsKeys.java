@@ -43,4 +43,8 @@ public class ShibbolethPropsKeys {
    	public static final String SHIBBOLETH_HEADER_AFFILIATION_PREFIX = "shibboleth.header.affiliation.prefix";
 
    	public static final String SHIBBOLETH_USER_ROLE_AUTO_CREATE = "shibboleth.user.role.auto.create";
+   	
+   	public static final String SHIBBOLETH_USER_PASSWORD_RESET_ENABLED = "shibboleth.user.password.reset.enabled";
+   	
+   	public static final String SHIBBOLETH_ATTRIBUTES_UTF8CONVERSION_ENABLED = "shibboleth.attributes.utf8conversion.enabled";
 }

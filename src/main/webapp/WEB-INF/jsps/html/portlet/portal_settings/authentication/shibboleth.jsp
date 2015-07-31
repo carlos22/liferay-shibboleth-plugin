@@ -19,6 +19,9 @@
     final String SHIBBOLETH_USER_ROLE_AUTO_ASSIGN_SUBTYPE = "shibboleth.user.role.auto.assign.subtype";
     final String SHIBBOLETH_HEADER_AFFILIATION_PREFIX = "shibboleth.header.affiliation.prefix";
     final String SHIBBOLETH_USER_ROLE_AUTO_CREATE = "shibboleth.user.role.auto.create";
+    
+    final String SHIBBOLETH_USER_PASSWORD_RESET_ENABLED = "shibboleth.user.password.reset.enabled";
+    final String SHIBBOLETH_ATTRIBUTES_UTF8CONVERSION_ENABLED = "shibboleth.attributes.utf8conversion.enabled";
 
     String shibbolethEnabled = PrefsPropsUtil.getString(company.getCompanyId(), SHIBBOLETH_ENABLED, "false");
     String shibbolethHeader = PrefsPropsUtil.getString(company.getCompanyId(), SHIBBOLETH_HEADER, "");
@@ -39,6 +42,10 @@
     String shibbolethUserRoleAutoAssignSubtype = PrefsPropsUtil.getString(company.getCompanyId(), SHIBBOLETH_USER_ROLE_AUTO_ASSIGN_SUBTYPE, "");
     String shibbolethHeaderAffiliationPrefix = PrefsPropsUtil.getString(company.getCompanyId(), SHIBBOLETH_HEADER_AFFILIATION_PREFIX, "");
     String shibbolethUserRoleAutoCreate = PrefsPropsUtil.getString(company.getCompanyId(), SHIBBOLETH_USER_ROLE_AUTO_CREATE, "false");
+    
+    String shibbolethUserPasswordResetEnabled = PrefsPropsUtil.getString(company.getCompanyId(), SHIBBOLETH_USER_PASSWORD_RESET_ENABLED, "false");
+    String shibbolethAttributesUtf8ConversionEnabled = PrefsPropsUtil.getString(company.getCompanyId(), SHIBBOLETH_ATTRIBUTES_UTF8CONVERSION_ENABLED, "false");
+            
 %>
 <aui:fieldset>
         <aui:input label="enabled" name='<%="settings--" + SHIBBOLETH_ENABLED + "--" %>' type="checkbox"
@@ -85,7 +92,8 @@
                    value="<%= shibbolethHeaderAffiliationPrefix %>"/>   
         <aui:input label="shibboleth-headers-enable" name='<%= "settings--" + SHIBBOLETH_HEADERS_ENABLE + "--" %>'
                    type="checkbox" value="<%= shibbolethHeadersEnabled %>"/>
+        <aui:input label="shibboleth-user-password-reset-enabled" name='<%= "settings--" + SHIBBOLETH_USER_PASSWORD_RESET_ENABLED + "--" %>'
+                   type="checkbox" value="<%= shibbolethUserPasswordResetEnabled %>"/>
+        <aui:input label="shibboleth-attributes-utf8conversion-enabled" name='<%= "settings--" + SHIBBOLETH_ATTRIBUTES_UTF8CONVERSION_ENABLED + "--" %>'
+                   type="checkbox" value="<%= shibbolethAttributesUtf8ConversionEnabled %>"/>
 </aui:fieldset>
-
-
-
