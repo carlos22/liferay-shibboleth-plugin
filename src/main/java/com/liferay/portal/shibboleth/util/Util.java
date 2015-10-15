@@ -117,4 +117,14 @@ public final class Util {
 		return GetterUtil.get(getValue(companyId, ShibbolethPropsKeys.SHIBBOLETH_USER_ROLE_AUTO_CREATE),
 				ShibbolethPropsValues.SHIBBOLETH_USER_ROLE_AUTO_CREATE);
 	}
+
+	public static boolean isUserPasswordReset(long companyId) throws Exception {
+		return GetterUtil.get(getValue(companyId, ShibbolethPropsKeys.SHIBBOLETH_USER_PASSWORD_RESET_ENABLED),
+				ShibbolethPropsValues.SHIBBOLETH_USER_PASSWORD_RESET_ENABLED);
+	}
+
+	public static boolean isAttributeUtf8Conversion(long companyId) throws Exception {
+		return GetterUtil.get(getValue(companyId, ShibbolethPropsKeys.SHIBBOLETH_ATTRIBUTES_UTF8CONVERSION_ENABLED),
+				ShibbolethPropsValues.SHIBBOLETH_ATTRIBUTES_UTF8CONVERSION_ENABLED);
+	}
 }

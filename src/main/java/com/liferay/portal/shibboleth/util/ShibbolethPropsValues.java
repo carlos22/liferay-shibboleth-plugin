@@ -45,4 +45,9 @@ public class ShibbolethPropsValues {
     public static final String SHIBBOLETH_HEADER_AFFILIATION_PREFIX= PropsUtil.get(ShibbolethPropsKeys.SHIBBOLETH_HEADER_AFFILIATION_PREFIX);
    
     public static final boolean SHIBBOLETH_USER_ROLE_AUTO_CREATE = GetterUtil.getBoolean(PropsUtil.get(ShibbolethPropsKeys.SHIBBOLETH_USER_ROLE_AUTO_CREATE));
+    
+    public static final boolean SHIBBOLETH_USER_PASSWORD_RESET_ENABLED = GetterUtil.getBoolean(PropsUtil.get(ShibbolethPropsKeys.SHIBBOLETH_USER_PASSWORD_RESET_ENABLED));
+    
+    public static final boolean SHIBBOLETH_ATTRIBUTES_UTF8CONVERSION_ENABLED = GetterUtil.getBoolean(PropsUtil.get(ShibbolethPropsKeys.SHIBBOLETH_ATTRIBUTES_UTF8CONVERSION_ENABLED));
+    
 }

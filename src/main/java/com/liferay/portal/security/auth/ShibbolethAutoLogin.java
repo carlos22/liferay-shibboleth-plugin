@@ -21,6 +21,7 @@ import com.liferay.portal.util.PortalUtil;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
 import java.util.*;
 
 /**
@@ -116,7 +117,7 @@ public class ShibbolethAutoLogin implements AutoLogin {
 
             if (Util.autoUpdateUser(companyId)) {
                 _log.info("Auto-updating user...");
-                updateUserFromSession(user, session);
+                updateUserFromSession(companyId, user, session);
             }
 
         } catch (NoSuchUserException e) {
@@ -147,25 +148,25 @@ public class ShibbolethAutoLogin implements AutoLogin {
     protected User createUserFromSession(long companyId, HttpSession session) throws Exception {
         User user = null;
 
-        String screenName = (String) session.getAttribute(ShibbolethPropsKeys.SHIBBOLETH_LOGIN);
+        String screenName = convertAttribute(companyId, (String) session.getAttribute(ShibbolethPropsKeys.SHIBBOLETH_LOGIN));
         if (Validator.isNull(screenName)) {
             _log.error("Cannot create user - missing screen name");
             return user;
         }
 
-        String emailAddress = (String) session.getAttribute(ShibbolethPropsKeys.SHIBBOLETH_HEADER_EMAIL);
+        String emailAddress = convertAttribute(companyId, (String) session.getAttribute(ShibbolethPropsKeys.SHIBBOLETH_HEADER_EMAIL));
         if (Validator.isNull(emailAddress)) {
             _log.error("Cannot create user - missing email");
             return user;
         }
 
-        String firstname = (String) session.getAttribute(ShibbolethPropsKeys.SHIBBOLETH_HEADER_FIRSTNAME);
+        String firstname = convertAttribute(companyId, (String) session.getAttribute(ShibbolethPropsKeys.SHIBBOLETH_HEADER_FIRSTNAME));
         if (Validator.isNull(firstname)) {
             _log.error("Cannot create user - missing firstname");
             return user;
         }
 
-        String surname = (String) session.getAttribute(ShibbolethPropsKeys.SHIBBOLETH_HEADER_SURNAME);
+        String surname = convertAttribute(companyId, (String) session.getAttribute(ShibbolethPropsKeys.SHIBBOLETH_HEADER_SURNAME));
         if (Validator.isNull(surname)) {
             _log.error("Cannot create user - missing surname");
             return user;
@@ -174,6 +175,7 @@ public class ShibbolethAutoLogin implements AutoLogin {
         _log.info("Creating user: screen name = [" + screenName + "], emailAddress = [" + emailAddress
                 + "], first name = [" + firstname + "], surname = [" + surname + "]");
 
+        
         return addUser(companyId, screenName, emailAddress, firstname, surname);
     }
 
@@ -208,16 +210,29 @@ public class ShibbolethAutoLogin implements AutoLogin {
         boolean sendEmail = false;
         ServiceContext serviceContext = null;
 
-        return UserLocalServiceUtil.addUser(creatorUserId, companyId, autoPassword, password1, password2,
+        User user =  UserLocalServiceUtil.addUser(creatorUserId, companyId, autoPassword, password1, password2,
                 autoScreenName, screenName, emailAddress, facebookId, openId, locale, firstName, middleName, lastName,
                 prefixId, suffixId, male, birthdayMonth, birthdayDay, birthdayYear, jobTitle, groupIds,
                 organizationIds, roleIds, userGroupIds, sendEmail, serviceContext);
+        
+        user.setPasswordReset(false);
+        if (Util.isUserPasswordReset(companyId))
+    	{
+          user.setPasswordReset(true);
+    	}
+        
+//        user.setAgreedToTermsOfUse(true);
+//        user.setReminderQueryAnswer("default");
+//        user.setReminderQueryAnswer("default");
+        UserLocalServiceUtil.updateUser(user);
+        
+        return user;
     }
 
-    protected void updateUserFromSession(User user, HttpSession session) throws Exception {
+    protected void updateUserFromSession(long companyId, User user, HttpSession session) throws Exception {
         boolean modified = false;
 
-        String emailAddress = (String) session.getAttribute(ShibbolethPropsKeys.SHIBBOLETH_HEADER_EMAIL);
+        String emailAddress = convertAttribute(companyId, (String) session.getAttribute(ShibbolethPropsKeys.SHIBBOLETH_HEADER_EMAIL));
         if (Validator.isNotNull(emailAddress) && !user.getEmailAddress().equals(emailAddress)) {
             _log.info("User [" + user.getScreenName() + "]: update email address [" + user.getEmailAddress()
                     + "] --> [" + emailAddress + "]");
@@ -225,7 +240,7 @@ public class ShibbolethAutoLogin implements AutoLogin {
             modified = true;
         }
 
-        String firstname = (String) session.getAttribute(ShibbolethPropsKeys.SHIBBOLETH_HEADER_FIRSTNAME);
+        String firstname = convertAttribute(companyId, (String) session.getAttribute(ShibbolethPropsKeys.SHIBBOLETH_HEADER_FIRSTNAME));
         if (Validator.isNotNull(firstname) && !user.getFirstName().equals(firstname)) {
             _log.info("User [" + user.getScreenName() + "]: update first name [" + user.getFirstName() + "] --> ["
                     + firstname + "]");
@@ -233,17 +248,40 @@ public class ShibbolethAutoLogin implements AutoLogin {
             modified = true;
         }
 
-        String surname = (String) session.getAttribute(ShibbolethPropsKeys.SHIBBOLETH_HEADER_SURNAME);
+        String surname = convertAttribute(companyId, (String) session.getAttribute(ShibbolethPropsKeys.SHIBBOLETH_HEADER_SURNAME));
         if (Validator.isNotNull(surname) && !user.getLastName().equals(surname)) {
             _log.info("User [" + user.getScreenName() + "]: update last name [" + user.getLastName() + "] --> ["
                     + surname + "]");
             user.setLastName(surname);
             modified = true;
         }
-
+        
         if (modified) {
             UserLocalServiceUtil.updateUser(user);
         }
+    }
+    
+	/**
+	 * Shibboleth attributes are by default UTF-8 encoded. However, depending on
+	 * the servlet contaner configuration they are interpreted as ISO-8859-1
+	 * values. This causes problems with non-ASCII characters. The solution is
+	 * to re-encode attributes, e.g. with:
+	 * 
+	 * @see https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPAttributeAccess
+	 *      #NativeSPAttributeAccess-Tool-SpecificExamples
+	 *      
+	 * @param attribute
+	 *            shibboleth attribute
+	 * @return return utf-8 converted attribute, if enabled
+	 * @throws Exception
+	 */
+    private String convertAttribute(long companyId, String attribute) throws Exception
+    {
+    	if (attribute != null && Util.isAttributeUtf8Conversion(companyId))
+    	{
+    		return new String(attribute.getBytes("ISO-8859-1"), "UTF-8");
+    	}
+    	return attribute;
     }
 
     private void updateUserRolesFromSession(long companyId, User user, HttpSession session) throws Exception {
